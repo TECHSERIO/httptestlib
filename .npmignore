@@ -1,0 +1,7 @@
+
+# Source & deps
+node_modules/
+src/
+
+# OS-specific
+.DS_Store

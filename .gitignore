@@ -1,0 +1,7 @@
+
+# Build & deps
+node_modules/
+build/
+
+# OS-specific
+.DS_Store
