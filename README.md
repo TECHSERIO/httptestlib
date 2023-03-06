@@ -72,8 +72,8 @@ testlib.test("ping_local", "Ping localhost (127.0.0.1:80)", async (context) => {
 ```
 ## `.test() > context`
 The test context contains a few methods to perform checks, prepare environment and clean things up afterwards.
-- `pass()` - Used to stop mark the test as **passed**.
-- `fail()` - Used to stop mark the test as **failed**.
+- `pass()` - Used to mark the test as **passed**.
+- `fail()` - Used to mark the test as **failed**.
 - `expect(description, var, expectedVat)` - Used to perform checks on variables during tests
    ```typescript
    context.expect("description", testedValue, expectedValue)
