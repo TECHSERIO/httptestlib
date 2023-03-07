@@ -74,9 +74,20 @@ testlib.test("ping_local", "Ping localhost (127.0.0.1:80)", async (context) => {
 The test context contains a few methods to perform checks, prepare environment and clean things up afterwards.
 - `pass()` - Used to mark the test as **passed**.
 - `fail()` - Used to mark the test as **failed**.
-- `expect(description, var, expectedVat)` - Used to perform checks on variables during tests
+- `expect(description, var, expectedVat)` - Used to perform checks on variables during tests.
    ```typescript
-   context.expect("description", testedValue, expectedValue)
+   context.expect("description", testedValue, expectedValue, ignoredKeys?)
+   ```
+   This method can perform comparisons on multiple variable types, including objects:
+   ```typescript
+   let object1 = { x: true, y: { z: false } }
+   let object2 = { x: true }
+   context.expect("Compare object1 against object2", object1, object2) // => pass
+   context.expect("Compare object2 against object1", object2, object1) // => fail
+   ```
+   You can also ignore nested object props while performing object checks:
+   ```typescript
+   context.expect("Compare object2 against object1", object2, object1, ["x.y"]) // => pass
    ```
 - `phase(string)` - Sets the "phase" displayed in test case errors and the object returned by the `run()` method. The phase name is there to quickly identify where an error had accured. `context.setup()` and `context.cleanup()` automatically set `setup` and `cleanup` phases respectively inside their scope. The scope can be changed multiple times during one test case.
    ```typescript
@@ -86,16 +97,17 @@ The test context contains a few methods to perform checks, prepare environment a
    context.phase("test")
    context.expect("var1 to be boolean", typeof var1, 'boolean')
    ```
-- `setup(callback)` - By convention specified at the top of the test case, used to set things up before the main test, like open a database connection, write to a file, etc. The setup callback has access most of the methods from the test case context object. These are: `expect`, `keepSuccessfulLogs`, `pass`, `fail`.
+- `setup(callback)` - By convention specified at the top of the test case, used to set things up before the main test, like opening a database connection, writing to a file, etc. The setup callback has access most of the methods from the test case context object. These are: `expect`, `keepSuccessfulLogs`, `pass`, `fail`.
 It can not set phases or have own setup functions.
-It is prefered that setup functions are defined as a reusable function as they might be used by multiple test cases.
+It is prefered that the callback passed to the setup method is defined as a reusable (global) function as it might be used by multiple tests.
    ```typescript
    context.setup(async (context) => {
        // Create a database, write initial values to some files, etc...
    })
    ```
-- `cleanup(callback)` - Specified at the top of the test case, used to perform cleanups after the test case. If specified, a callback provided to it will always run, whether the test had failed or not. Useful to clean up leftover files, configuration or DB entries after the test to ensure the test environment is left the same way it was before testing.
-`cleanup`, similarily to `setup` has a context of it's own, but only with access to `fail` and `pass` methods.by multiple test cases.
+- `cleanup(callback)` - Specified at the top of the test case, used to perform cleanups after the test. If specified, a callback provided to it will always run, whether the test had failed or not. Useful to clean up leftover files, configuration or DB entries after the test to ensure the test environment is left the same way it was before testing.
+`cleanup`, similarily to `setup` has a context of it's own, but only with access to `fail` and `pass` methods.
+Note that if a test fails, for example when a `expect()` call catches an error, that expectation will still be logged to the expectations array. 
    ```typescript
    context.cleanup(async (context) => {
        // Clean database entries, delete files, etc...
@@ -105,10 +117,3 @@ It is prefered that setup functions are defined as a reusable function as they m
    ```typescript
    context.keepSuccessfulLogs(false)
    ```
-
-
-
-
-
-
-
